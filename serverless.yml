@@ -1,0 +1,45 @@
+service: myserverlessproject3wilmarux
+
+provider:
+    name: aws
+    runtime: nodejs12.x
+    profile: amplify-sjwxT
+    region: us-east-1
+    stage: dev
+    environment:
+        imageUploadBucket: ${self:custom.soyelbucket}
+        region: ${self:provider.region}
+    iamRoleStatements:
+        - Effect: Allow
+          Action:
+              - dynamodb:*
+              - s3:*
+              - ses:*
+          Resource: '*'
+
+plugins:
+    - serverless-webpack
+
+package:
+    individually: true
+
+custom:
+    soyelbucket: wilmaruximageuploadbucketdemosws2
+
+functions:
+    imageUpload:
+        handler: lambda/endpoints/imageUpload.handler
+        events:
+            - http:
+                  path: image-upload
+                  method: POST
+                  cors: true
+
+resources:
+    Resources:
+        ImageUploadBucket:
+            Type: AWS::S3::Bucket
+            Properties:
+                BucketName: ${self:custom.soyelbucket}
+                AccessControl: PublicRead
+     
